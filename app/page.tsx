@@ -34,7 +34,7 @@ export default function Home() {
       <section className="hero" id="home">
         <div className="hero-copy">
           <div className="eyebrow"><span className="status-dot" /> برنامه‌نویسی نرم‌افزار <i>×</i> هوش مصنوعی</div>
-          <h1>سلام، <span className="hero-name">خوش آمدید.</span><br />کد می‌زنم برای<br /><span className="hero-highlight">آینده‌ای هوشمندتر.</span></h1>
+          <h1>سلام، <span className="hero-name">خوش آمدید.</span><br /><span className="hero-highlight">همسر نگین خانم</span></h1>
           <p className="hero-description">از ایده تا پیاده‌سازی؛ به ساخت نرم‌افزارهایی فکر می‌کنم که هوش مصنوعی را به تجربه‌ای مفید و انسانی تبدیل می‌کنند.</p>
           <div className="hero-actions"><a className="button button-primary" href="#work">دیدن پروژه‌ها <Arrow /></a><a className="text-link" href="#about">بیشتر دربارهٔ من <Arrow /></a></div>
           <div className="hero-note"><span className="note-line" /> از کدهای تمیز تا ایده‌های جسورانه</div>
