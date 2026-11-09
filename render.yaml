@@ -4,8 +4,8 @@ services:
     runtime: node
     plan: free
     rootDir: backend
-    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm build
-    startCommand: pnpm start:prod
+    buildCommand: npm install --include=dev && npm run build
+    startCommand: npm run start:prod
     healthCheckPath: /api/v1/health
     envVars:
       - key: NODE_VERSION
@@ -19,4 +19,4 @@ services:
       - key: SUPABASE_SECRET_KEY
         sync: false
       - key: CHAT_ADMIN_EMAIL
-        sync: false
+        value: sajjadsalimk.1381@gmail.com

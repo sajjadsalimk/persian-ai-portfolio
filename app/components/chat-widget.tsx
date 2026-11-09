@@ -3,6 +3,7 @@
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { getSupabaseBrowserClient } from "../lib/supabase-client";
+import EmojiPicker from "./emoji-picker";
 
 type Conversation = {
   id: string;
@@ -236,7 +237,7 @@ export default function ChatWidget() {
               })}
             </div>
             {error && <div className="chat-inline-error" role="alert">{error}</div>}
-            <form onSubmit={sendMessage} className="chat-compose"><textarea aria-label="متن پیام" placeholder="پیامت را اینجا بنویس…" value={draft} onChange={(event) => setDraft(event.target.value)} maxLength={3000} rows={2} /><button disabled={busy || !draft.trim() || !activeConversation} type="submit" aria-label="ارسال پیام">↑</button></form>
+            <form onSubmit={sendMessage} className="chat-compose"><EmojiPicker onSelect={(emoji) => setDraft((value) => `${value}${emoji}`)} /><textarea aria-label="متن پیام" placeholder="پیامت را اینجا بنویس…" value={draft} onChange={(event) => setDraft(event.target.value)} maxLength={3000} rows={2} /><button disabled={busy || !draft.trim() || !activeConversation} type="submit" aria-label="ارسال پیام">↑</button></form>
             <div className="chat-footnote">پیام‌ها به‌صورت خصوصی ذخیره می‌شوند</div>
           </div>
         )}
