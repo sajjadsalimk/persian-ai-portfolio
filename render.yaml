@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: persian-ai-portfolio-api
+    runtime: node
+    rootDir: backend
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm build
+    startCommand: pnpm start:prod
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: NODE_VERSION
+        value: 22.20.0
+      - key: PORT
+        value: 10000
+      - key: CORS_ORIGINS
+        value: https://sajjadsalimk.github.io,http://localhost:3000,http://localhost:3001
+      - key: SUPABASE_URL
+        value: https://pczvddrpmmlfeviyhraz.supabase.co
+      - key: SUPABASE_SECRET_KEY
+        sync: false
+      - key: CHAT_ADMIN_EMAIL
+        sync: false

@@ -4,11 +4,15 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "api:dev": "pnpm --dir backend start:dev",
+    "api:build": "pnpm --dir backend build",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint app",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.119.0",
     "next": "^15.3.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

@@ -12,7 +12,9 @@ export default function CursorTrail() {
     const context = canvas?.getContext("2d");
     if (!canvas || !context) return;
 
-    const finePointer = window.matchMedia("(pointer: fine)");
+    // Keep the decorative desktop cursor off narrow layouts, including desktop
+    // browser emulation of an iPhone where the physical pointer is still fine.
+    const finePointer = window.matchMedia("(pointer: fine) and (min-width: 651px)");
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     if (!finePointer.matches || reducedMotion.matches) return;
 

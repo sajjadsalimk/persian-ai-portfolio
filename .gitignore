@@ -2,6 +2,11 @@ node_modules/
 .pnpm-store/
 pnpm-store/
 .next/
+backend/node_modules/
+backend/dist/
+backend/.env
+backend/.env.*
+!backend/.env.example
 out/
 dist/
 coverage/
@@ -11,3 +16,4 @@ coverage/
 *.log
 .DS_Store
 Thumbs.db
+*.tsbuildinfo
