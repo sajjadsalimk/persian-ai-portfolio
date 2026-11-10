@@ -21,7 +21,6 @@ export default function AdminChat() {
   const supabase = useMemo(() => getSupabaseBrowserClient(), []);
   const [session, setSession] = useState<Session | null>(null);
   const [ready, setReady] = useState(false);
-  const [authorized, setAuthorized] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -34,7 +33,7 @@ export default function AdminChat() {
   useEffect(() => {
     if (!supabase) { setReady(true); return; }
     void supabase.auth.getSession().then(({ data }) => { setSession(data.session); setReady(true); });
-    const { data } = supabase.auth.onAuthStateChange((_event, value) => { setSession(value); setAuthorized(false); setConversations([]); setActive(null); setMessages([]); setError(""); });
+    const { data } = supabase.auth.onAuthStateChange((_event, value) => { setSession(value); setConversations([]); setActive(null); setMessages([]); setError(""); });
     return () => data.subscription.unsubscribe();
   }, [supabase]);
 
@@ -54,13 +53,13 @@ export default function AdminChat() {
 
   const refresh = useCallback(async (token: string) => {
     const profile = await request<{ isAdmin: boolean }>("/chat/me", token);
-    if (!profile.isAdmin) { setAuthorized(false); throw new Error("این حساب دسترسی مدیر ندارد."); }
-    setAuthorized(true);
+    if (!profile.isAdmin) throw new Error("این حساب دسترسی مدیر ندارد.");
     const result = await request<{ conversations: Conversation[] }>("/chat/conversations", token);
     setConversations(result.conversations);
     const selected = result.conversations.find((item) => item.id === active?.id) ?? result.conversations[0] ?? null;
     setActive((current) => current?.id === selected?.id ? current : selected);
     if (selected) await loadMessages(selected, token); else setMessages([]);
+    setError("");
   }, [active?.id, loadMessages, request]);
 
   useEffect(() => {
@@ -68,10 +67,10 @@ export default function AdminChat() {
     void refresh(session.access_token).catch((cause) => setError(cause instanceof Error ? cause.message : "بارگذاری انجام نشد."));
   }, [session?.access_token, refresh]);
   useEffect(() => {
-    if (!authorized || !session?.access_token) return;
-    const timer = window.setInterval(() => void refresh(session.access_token).catch(() => undefined), 2500);
+    if (!session?.access_token) return;
+    const timer = window.setInterval(() => void refresh(session.access_token).catch((cause) => setError(cause instanceof Error ? cause.message : "بارگذاری انجام نشد.")), 3000);
     return () => window.clearInterval(timer);
-  }, [authorized, refresh, session?.access_token]);
+  }, [refresh, session?.access_token]);
 
   async function login(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); if (!supabase) return;
