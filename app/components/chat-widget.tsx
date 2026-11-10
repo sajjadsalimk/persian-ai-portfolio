@@ -174,12 +174,12 @@ export default function ChatWidget() {
     setBusy(true);
     setError("");
     try {
-      await request(`/chat/conversations/${activeConversation.id}/messages`, session.access_token, {
+      const result = await request<{ message: ChatMessage }>(`/chat/conversations/${activeConversation.id}/messages`, session.access_token, {
         method: "POST",
         body: JSON.stringify({ body: draft.trim() }),
       });
       setDraft("");
-      await loadMessages(activeConversation, session.access_token);
+      setMessages((current) => current.some((item) => item.id === result.message.id) ? current : [...current, result.message]);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "پیام ارسال نشد.");
     } finally {

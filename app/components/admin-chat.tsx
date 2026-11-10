@@ -69,7 +69,7 @@ export default function AdminChat() {
   }, [session?.access_token, refresh]);
   useEffect(() => {
     if (!authorized || !session?.access_token) return;
-    const timer = window.setInterval(() => void refresh(session.access_token).catch(() => undefined), 5000);
+    const timer = window.setInterval(() => void refresh(session.access_token).catch(() => undefined), 2500);
     return () => window.clearInterval(timer);
   }, [authorized, refresh, session?.access_token]);
 
@@ -83,7 +83,12 @@ export default function AdminChat() {
   async function send(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); if (!active || !session?.access_token || !draft.trim()) return;
     setBusy(true); setError("");
-    try { await request(`/chat/conversations/${active.id}/messages`, session.access_token, { method: "POST", body: JSON.stringify({ body: draft.trim() }) }); setDraft(""); await loadMessages(active, session.access_token); await refresh(session.access_token); }
+    try {
+      const result = await request<{ message: Message }>(`/chat/conversations/${active.id}/messages`, session.access_token, { method: "POST", body: JSON.stringify({ body: draft.trim() }) });
+      setDraft("");
+      setMessages((current) => current.some((item) => item.id === result.message.id) ? current : [...current, result.message]);
+      void refresh(session.access_token).catch((cause) => setError(cause instanceof Error ? cause.message : "به‌روزرسانی صندوق انجام نشد."));
+    }
     catch (cause) { setError(cause instanceof Error ? cause.message : "ارسال پاسخ انجام نشد."); }
     finally { setBusy(false); }
   }
