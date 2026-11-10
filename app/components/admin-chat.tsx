@@ -82,14 +82,18 @@ export default function AdminChat() {
   }
   async function send(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); if (!active || !session?.access_token || !draft.trim()) return;
+    const body = draft.trim();
+    const pendingId = `pending-${Date.now()}`;
+    const pendingMessage: Message = { id: pendingId, conversation_id: active.id, sender_id: session.user.id, sender_role: "admin", body, created_at: new Date().toISOString() };
+    setMessages((current) => [...current, pendingMessage]);
+    setDraft("");
     setBusy(true); setError("");
     try {
-      const result = await request<{ message: Message }>(`/chat/conversations/${active.id}/messages`, session.access_token, { method: "POST", body: JSON.stringify({ body: draft.trim() }) });
-      setDraft("");
-      setMessages((current) => current.some((item) => item.id === result.message.id) ? current : [...current, result.message]);
+      const result = await request<{ message: Message }>(`/chat/conversations/${active.id}/messages`, session.access_token, { method: "POST", body: JSON.stringify({ body }) });
+      setMessages((current) => current.map((item) => item.id === pendingId ? result.message : item));
       void refresh(session.access_token).catch((cause) => setError(cause instanceof Error ? cause.message : "به‌روزرسانی صندوق انجام نشد."));
     }
-    catch (cause) { setError(cause instanceof Error ? cause.message : "ارسال پاسخ انجام نشد."); }
+    catch (cause) { setMessages((current) => current.filter((item) => item.id !== pendingId)); setDraft((current) => current || body); setError(cause instanceof Error ? cause.message : "ارسال پاسخ انجام نشد."); }
     finally { setBusy(false); }
   }
   async function logout() { await supabase?.auth.signOut(); }

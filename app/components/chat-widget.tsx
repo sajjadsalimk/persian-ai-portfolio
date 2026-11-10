@@ -171,16 +171,29 @@ export default function ChatWidget() {
   async function sendMessage(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!session?.access_token || !activeConversation || !draft.trim()) return;
+    const body = draft.trim();
+    const pendingId = `pending-${Date.now()}`;
+    const pendingMessage: ChatMessage = {
+      id: pendingId,
+      conversation_id: activeConversation.id,
+      sender_id: session.user.id,
+      sender_role: isAdmin ? "admin" : "user",
+      body,
+      created_at: new Date().toISOString(),
+    };
+    setMessages((current) => [...current, pendingMessage]);
+    setDraft("");
     setBusy(true);
     setError("");
     try {
       const result = await request<{ message: ChatMessage }>(`/chat/conversations/${activeConversation.id}/messages`, session.access_token, {
         method: "POST",
-        body: JSON.stringify({ body: draft.trim() }),
+        body: JSON.stringify({ body }),
       });
-      setDraft("");
-      setMessages((current) => current.some((item) => item.id === result.message.id) ? current : [...current, result.message]);
+      setMessages((current) => current.map((item) => item.id === pendingId ? result.message : item));
     } catch (cause) {
+      setMessages((current) => current.filter((item) => item.id !== pendingId));
+      setDraft((current) => current || body);
       setError(cause instanceof Error ? cause.message : "پیام ارسال نشد.");
     } finally {
       setBusy(false);
